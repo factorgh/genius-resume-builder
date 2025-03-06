@@ -24,10 +24,10 @@ const Preview = ({ savedCVs }: PreviewProps) => {
   });
 
   // Skill level to width percentage
-  const getSkillLevelWidth = (level: number): string => {
-    const percentage = (level / 5) * 100;
-    return `${percentage}%`;
-  };
+  // const getSkillLevelWidth = (level: number): string => {
+  //   const percentage = (level / 5) * 100;
+  //   return `${percentage}%`;
+  // };
 
   // Format date for display
   const formatDate = (dateString: string): string => {
