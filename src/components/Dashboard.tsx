@@ -71,7 +71,7 @@ const Dashboard = ({ savedCVs, deleteCV }: DashboardProps) => {
             </span>
           </h1>
           <p className="text-[#595959] mt-2 text-lg">
-            Craft your perfect resume with our smart CV builder
+            Craft your perfect resume with our CV builder
           </p>
         </div>
         <button
