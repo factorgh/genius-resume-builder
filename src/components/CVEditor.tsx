@@ -19,7 +19,9 @@ import {
   Trash2,
   User,
   Wand,
+  BadgeCheck,
   X,
+  HelpingHand,
 } from "lucide-react";
 
 import { CV, Education, Experience, Skill } from "../types/CV";
@@ -33,6 +35,17 @@ import { AIService } from "../services/AIService";
 interface CVEditorProps {
   savedCVs: CV[];
   saveCV: (cv: CV) => void;
+}
+
+export interface Qualification {
+  id: number;
+  text: string;
+}
+
+export interface Volunteering {
+  id: number;
+  title: string;
+  organization: string;
 }
 
 const CVEditor = ({ savedCVs, saveCV }: CVEditorProps) => {
@@ -57,6 +70,51 @@ const CVEditor = ({ savedCVs, saveCV }: CVEditorProps) => {
     originalContent: string;
   } | null>(null);
 
+  const [qualificationsList, setQualificationsList] = useState<Qualification[]>(
+    []
+  );
+  const [volunteeringList, setVolunteeringList] = useState<Volunteering[]>([]);
+
+  const addQualification = () => {
+    setQualificationsList([
+      ...qualificationsList,
+      { id: Date.now(), text: "" },
+    ]);
+  };
+
+  const updateQualification = (id: number, newText: string) => {
+    setQualificationsList(
+      qualificationsList.map((q) => (q.id === id ? { ...q, text: newText } : q))
+    );
+  };
+
+  const removeQualification = (id: number) => {
+    setQualificationsList(qualificationsList.filter((q) => q.id !== id));
+  };
+
+  const addVolunteering = () => {
+    setVolunteeringList([
+      ...volunteeringList,
+      { id: Date.now(), title: "", organization: "" },
+    ]);
+  };
+
+  const updateVolunteering = (
+    id: number,
+    field: keyof Volunteering,
+    newValue: string
+  ) => {
+    setVolunteeringList(
+      volunteeringList.map((v) =>
+        v.id === id ? { ...v, [field]: newValue } : v
+      )
+    );
+  };
+
+  const removeVolunteering = (id: number) => {
+    setVolunteeringList(volunteeringList.filter((v) => v.id !== id));
+  };
+
   const { register, handleSubmit, setValue } = useForm<CV>({
     defaultValues: {
       id: "",
@@ -73,7 +131,8 @@ const CVEditor = ({ savedCVs, saveCV }: CVEditorProps) => {
       },
       education: [],
       experience: [],
-      skills: [],
+      qualificationsList: [],
+      volunteeringList: [],
     },
   });
 
@@ -101,7 +160,7 @@ const CVEditor = ({ savedCVs, saveCV }: CVEditorProps) => {
 
         setEducationList(existingCV.education);
         setExperienceList(existingCV.experience);
-        setSkillsList(existingCV.skills);
+        setVolunteeringList(existingCV.volunteeringList);
       }
     }
   }, [id, savedCVs, setValue]);
@@ -308,7 +367,8 @@ const CVEditor = ({ savedCVs, saveCV }: CVEditorProps) => {
       lastModified: new Date().toISOString(),
       education: educationList,
       experience: experienceList,
-      skills: skillsList,
+      volunteeringList: volunteeringList,
+      qualificationsList: qualificationsList,
     };
 
     saveCV(finalCV);
@@ -415,20 +475,33 @@ const CVEditor = ({ savedCVs, saveCV }: CVEditorProps) => {
                     }`}
                   >
                     <Briefcase size={18} className="mr-3" />
-                    Experience
+                    Work Experience
                   </button>
                 </li>
                 <li>
                   <button
-                    onClick={() => setActiveSection("skills")}
+                    onClick={() => setActiveSection("qualifications")}
                     className={`flex items-center w-full text-left px-4 py-3 rounded-lg transition-all duration-300 ${
-                      activeSection === "skills"
+                      activeSection === "qualifications"
                         ? "bg-white text-[#22504A] font-medium"
                         : "text-white hover:bg-[#578C84]/20"
                     }`}
                   >
-                    <Cpu size={18} className="mr-3" />
-                    Skills
+                    <BadgeCheck size={18} className="mr-3" />
+                    Summary of Qualifications
+                  </button>
+                </li>
+                <li>
+                  <button
+                    onClick={() => setActiveSection("volunteering")}
+                    className={`flex items-center w-full text-left px-4 py-3 rounded-lg transition-all duration-300 ${
+                      activeSection === "volunteering"
+                        ? "bg-white text-[#22504A] font-medium"
+                        : "text-white hover:bg-[#578C84]/20"
+                    }`}
+                  >
+                    <HelpingHand size={18} className="mr-3" />
+                    Publication and Voluntering
                   </button>
                 </li>
               </ul>
@@ -1217,6 +1290,162 @@ const CVEditor = ({ savedCVs, saveCV }: CVEditorProps) => {
                 </div>
               )}
 
+              {activeSection === "qualifications" && (
+                <div className="animate-fadeIn">
+                  <div className="flex justify-between items-center mb-6">
+                    <h2 className="text-xl font-semibold text-[#333333] font-heading">
+                      Summary of Qualifications
+                    </h2>
+                    <div className="flex items-center">
+                      <div className="bg-blue-50 border border-blue-100 rounded-md px-3 py-1.5 flex items-center text-blue-800 text-sm mr-2">
+                        <Info size={16} className="mr-1.5" />
+                        <span>Priority Section</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={addQualification}
+                        className="group inline-flex items-center text-sm bg-[#E6EFEE] text-[#22504A] px-4 py-2 rounded-lg hover:bg-[#C0D6D3] transition-colors"
+                      >
+                        <CirclePlus
+                          size={18}
+                          className="mr-2 transition-transform duration-300 group-hover:rotate-90"
+                        />
+                        Add Qualification
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="mb-4 p-4 bg-amber-50 border border-amber-100 rounded-lg">
+                    <h3 className="text-sm font-medium text-amber-800 mb-1">
+                      Resume Tip
+                    </h3>
+                    <p className="text-sm text-amber-700">
+                      Highlight key strengths and accomplishments that make you
+                      a strong candidate. Focus on measurable achievements.
+                    </p>
+                  </div>
+
+                  {qualificationsList.length === 0 ? (
+                    <div className="text-center py-12 border-2 border-dashed border-[#E0E0E0] rounded-xl bg-[#F9F9F9]">
+                      <BadgeCheck
+                        size={48}
+                        className="mx-auto text-[#CCCCCC] mb-4"
+                      />
+                      <h3 className="text-lg font-medium text-[#737373] mb-2">
+                        No qualifications added yet
+                      </h3>
+                      <p className="text-[#999999] mb-6 max-w-md mx-auto">
+                        List your top qualifications, strengths, and key
+                        accomplishments.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={addQualification}
+                        className="inline-flex items-center bg-[#285C56] text-white px-5 py-2.5 rounded-lg hover:bg-[#22504A] transition-colors shadow-button"
+                      >
+                        <CirclePlus size={18} className="mr-2" />
+                        Add Qualification
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                      {qualificationsList.map((item) => (
+                        <div
+                          key={item.id}
+                          className="p-4 border border-[#E0E0E0] rounded-lg bg-[#F9F9F9] flex items-center hover:shadow-sm transition-shadow duration-300"
+                        >
+                          <input
+                            value={item.text}
+                            onChange={(e) =>
+                              updateQualification(item.id, e.target.value)
+                            }
+                            placeholder="E.g., Strong research background, expertise in data analysis..."
+                            className="w-full px-4 py-2.5 border border-[#E0E0E0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D665F] transition-all duration-300"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => removeQualification(item.id)}
+                            className="ml-2 text-red-500 hover:text-red-700 p-1.5 hover:bg-red-50 rounded-full transition-colors"
+                          >
+                            <X size={18} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {activeSection === "volunteering" && (
+                <div className="animate-fadeIn">
+                  <div className="flex justify-between items-center mb-6">
+                    <h2 className="text-xl font-semibold text-[#333333] font-heading">
+                      Volunteering Experience
+                    </h2>
+                    <button
+                      type="button"
+                      onClick={addVolunteering}
+                      className="group inline-flex items-center text-sm bg-[#E6EFEE] text-[#22504A] px-4 py-2 rounded-lg hover:bg-[#C0D6D3] transition-colors"
+                    >
+                      <CirclePlus
+                        size={18}
+                        className="mr-2 transition-transform duration-300 group-hover:rotate-90"
+                      />
+                      Add Experience
+                    </button>
+                  </div>
+
+                  {volunteeringList.length === 0 ? (
+                    <div className="text-center py-12 border-2 border-dashed border-[#E0E0E0] rounded-xl bg-[#F9F9F9]">
+                      <Cpu size={48} className="mx-auto text-[#CCCCCC] mb-4" />
+                      <h3 className="text-lg font-medium text-[#737373] mb-2">
+                        No volunteering experience added yet
+                      </h3>
+                      <p className="text-[#999999] mb-6 max-w-md mx-auto">
+                        Include roles that showcase your community engagement
+                        and leadership.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={addVolunteering}
+                        className="inline-flex items-center bg-[#285C56] text-white px-5 py-2.5 rounded-lg hover:bg-[#22504A] transition-colors shadow-button"
+                      >
+                        <CirclePlus size={18} className="mr-2" />
+                        Add Experience
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 gap-5">
+                      {volunteeringList.map((vol) => (
+                        <div
+                          key={vol.id}
+                          className="p-4 border border-[#E0E0E0] rounded-lg bg-[#F9F9F9] flex items-center"
+                        >
+                          <input
+                            value={vol.title}
+                            onChange={(e) =>
+                              updateVolunteering(
+                                vol.id,
+                                "title",
+                                e.target.value
+                              )
+                            }
+                            placeholder="Role (e.g., Community Organizer)"
+                            className="w-full px-4 py-2.5 border border-[#E0E0E0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D665F] transition-all duration-300"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => removeVolunteering(vol.id)}
+                            className="ml-2 text-red-500 hover:text-red-700 p-1.5 hover:bg-red-50 rounded-full transition-colors"
+                          >
+                            <X size={18} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
               {/* Save Button */}
               <div className="mt-10 flex justify-end">
                 <button
