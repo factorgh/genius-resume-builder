@@ -163,6 +163,7 @@ const CVEditor = ({ savedCVs, saveCV }: CVEditorProps) => {
       experience: [],
       qualificationsList: [],
       volunteeringList: [],
+      publications: [],
     },
   });
 
@@ -191,6 +192,7 @@ const CVEditor = ({ savedCVs, saveCV }: CVEditorProps) => {
         setEducationList(existingCV.education);
         setExperienceList(existingCV.experience);
         setVolunteeringList(existingCV.volunteeringList);
+        setPublicationsList(existingCV.publications);
       }
     }
   }, [id, savedCVs, setValue]);
