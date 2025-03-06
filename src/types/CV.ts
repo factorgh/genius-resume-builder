@@ -1,4 +1,8 @@
-import { Qualification, Volunteering } from "../components/CVEditor";
+import {
+  Publication,
+  Qualification,
+  Volunteering,
+} from "../components/CVEditor";
 
 export interface PersonalInfo {
   fullName: string;
@@ -45,4 +49,5 @@ export interface CV {
   experience: Experience[];
   qualificationsList: Qualification[];
   volunteeringList: Volunteering[];
+  publications: Publication[];
 }

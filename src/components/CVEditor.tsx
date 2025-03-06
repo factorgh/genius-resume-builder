@@ -22,6 +22,7 @@ import {
   BadgeCheck,
   X,
   HelpingHand,
+  BookCheck,
 } from "lucide-react";
 
 import { CV, Education, Experience, Skill } from "../types/CV";
@@ -46,6 +47,12 @@ export interface Volunteering {
   id: number;
   title: string;
   organization: string;
+}
+
+export interface Publication {
+  id: number;
+  title: string;
+  source: string;
 }
 
 const CVEditor = ({ savedCVs, saveCV }: CVEditorProps) => {
@@ -74,6 +81,7 @@ const CVEditor = ({ savedCVs, saveCV }: CVEditorProps) => {
     []
   );
   const [volunteeringList, setVolunteeringList] = useState<Volunteering[]>([]);
+  const [publicationsList, setPublicationsList] = useState<Publication[]>([]);
 
   const addQualification = () => {
     setQualificationsList([
@@ -115,6 +123,28 @@ const CVEditor = ({ savedCVs, saveCV }: CVEditorProps) => {
     setVolunteeringList(volunteeringList.filter((v) => v.id !== id));
   };
 
+  const addPublication = () => {
+    setPublicationsList([
+      ...publicationsList,
+      { id: Date.now(), title: "", source: "" },
+    ]);
+  };
+
+  const updatePublication = (
+    id: number,
+    field: keyof Publication,
+    newValue: string
+  ) => {
+    setPublicationsList(
+      publicationsList.map((p) =>
+        p.id === id ? { ...p, [field]: newValue } : p
+      )
+    );
+  };
+
+  const removePublication = (id: number) => {
+    setPublicationsList(publicationsList.filter((p) => p.id !== id));
+  };
   const { register, handleSubmit, setValue } = useForm<CV>({
     defaultValues: {
       id: "",
@@ -369,6 +399,7 @@ const CVEditor = ({ savedCVs, saveCV }: CVEditorProps) => {
       experience: experienceList,
       volunteeringList: volunteeringList,
       qualificationsList: qualificationsList,
+      publications: publicationsList,
     };
 
     saveCV(finalCV);
@@ -493,6 +524,19 @@ const CVEditor = ({ savedCVs, saveCV }: CVEditorProps) => {
                 </li>
                 <li>
                   <button
+                    onClick={() => setActiveSection("publications")}
+                    className={`flex items-center w-full text-left px-4 py-3 rounded-lg transition-all duration-300 ${
+                      activeSection === "publications"
+                        ? "bg-white text-[#22504A] font-medium"
+                        : "text-white hover:bg-[#578C84]/20"
+                    }`}
+                  >
+                    <BookCheck size={18} className="mr-3" />
+                    Publications
+                  </button>
+                </li>
+                <li>
+                  <button
                     onClick={() => setActiveSection("volunteering")}
                     className={`flex items-center w-full text-left px-4 py-3 rounded-lg transition-all duration-300 ${
                       activeSection === "volunteering"
@@ -501,7 +545,7 @@ const CVEditor = ({ savedCVs, saveCV }: CVEditorProps) => {
                     }`}
                   >
                     <HelpingHand size={18} className="mr-3" />
-                    Publication and Voluntering
+                    Voluntering
                   </button>
                 </li>
               </ul>
@@ -1376,6 +1420,10 @@ const CVEditor = ({ savedCVs, saveCV }: CVEditorProps) => {
                 </div>
               )}
 
+              {/*  */}
+
+              {/*  */}
+
               {activeSection === "volunteering" && (
                 <div className="animate-fadeIn">
                   <div className="flex justify-between items-center mb-6">
@@ -1446,6 +1494,73 @@ const CVEditor = ({ savedCVs, saveCV }: CVEditorProps) => {
                   )}
                 </div>
               )}
+
+              {activeSection === "publications" && (
+                <div className="animate-fadeIn">
+                  <div className="flex justify-between items-center mb-6">
+                    <h2 className="text-xl font-semibold text-[#333333] font-heading">
+                      Publications
+                    </h2>
+                    <button
+                      type="button"
+                      onClick={addPublication}
+                      className="group inline-flex items-center text-sm bg-[#E6EFEE] text-[#22504A] px-4 py-2 rounded-lg hover:bg-[#C0D6D3] transition-colors"
+                    >
+                      <CirclePlus
+                        size={18}
+                        className="mr-2 transition-transform duration-300 group-hover:rotate-90"
+                      />
+                      Add Publication
+                    </button>
+                  </div>
+
+                  {publicationsList.length === 0 ? (
+                    <div className="text-center py-12 border-2 border-dashed border-[#E0E0E0] rounded-xl bg-[#F9F9F9]">
+                      <Cpu size={48} className="mx-auto text-[#CCCCCC] mb-4" />
+                      <h3 className="text-lg font-medium text-[#737373] mb-2">
+                        No publications added yet
+                      </h3>
+                      <p className="text-[#999999] mb-6 max-w-md mx-auto">
+                        List your published works, research papers, or articles.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={addPublication}
+                        className="inline-flex items-center bg-[#285C56] text-white px-5 py-2.5 rounded-lg hover:bg-[#22504A] transition-colors shadow-button"
+                      >
+                        <CirclePlus size={18} className="mr-2" />
+                        Add Publication
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 gap-5">
+                      {publicationsList.map((pub) => (
+                        <div
+                          key={pub.id}
+                          className="p-4 border border-[#E0E0E0] rounded-lg bg-[#F9F9F9] flex items-center"
+                        >
+                          <input
+                            value={pub.title}
+                            onChange={(e) =>
+                              updatePublication(pub.id, "title", e.target.value)
+                            }
+                            placeholder="Title (e.g., AI in Healthcare)"
+                            className="w-full px-4 py-2.5 border border-[#E0E0E0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D665F] transition-all duration-300"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => removePublication(pub.id)}
+                            className="ml-2 text-red-500 hover:text-red-700 p-1.5 hover:bg-red-50 rounded-full transition-colors"
+                          >
+                            <X size={18} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* Save Button */}
               <div className="mt-10 flex justify-end">
                 <button

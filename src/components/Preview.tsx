@@ -448,6 +448,25 @@ const Preview = ({ savedCVs }: PreviewProps) => {
                   </div>
                 )}
 
+                {cv.publications.length > 0 && (
+                  <div className={styles.section}>
+                    <h2 className={styles.sectionTitle}>Publications</h2>
+                    {cv.publications.map((publication) => (
+                      <div
+                        key={publication.id}
+                        className={styles.entryContainer}
+                      >
+                        <div className={styles.entryTitle}>
+                          {publication.title}
+                        </div>
+                        <div className={styles.entryDate}>
+                          {publication.source}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
                 {cv.volunteeringList.length > 0 && (
                   <div className={styles.section}>
                     <h2 className={styles.sectionTitle}>
